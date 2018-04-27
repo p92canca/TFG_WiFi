@@ -8,6 +8,8 @@ WiFiServer server(80);
 // Client variables 
 char linebuf[80];
 int charcount=0;
+char *cad;
+int aux;
 
 struct package
 {
@@ -19,8 +21,6 @@ struct package
 
 typedef struct package Package;
 Package data;
-
-char *token;
  
 void setup()
 {
@@ -83,28 +83,44 @@ void loop(){
           client.println("<!DOCTYPE HTML><html><head>");
           client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>");
           client.println("<h1>ESP32 - Web Server</h1>");
-          client.println("<form>Enter data:<br><input type=\"text\" name=\"data\"><br><input type=\"submit\" value=\"Submit\"></form>");
+          client.println("<form>Enter integer:<br><input type=\"text\" name=\"int\"><br><input type=\"submit\" value=\"Submit\"></form>");
+          client.println("<form>Enter character:<br><input type=\"text\" name=\"char\"><br><input type=\"submit\" value=\"Submit\"></form>");
+          client.println("<form>Enter boolean:<br><input type=\"text\" name=\"bool\"><br><input type=\"submit\" value=\"Submit\"></form>");
+          client.println("<form>Enter double:<br><input type=\"text\" name=\"double\"><br><input type=\"submit\" value=\"Submit\"></form>");
           client.println("</html>");
           break;
         }
         
         if (c == '\n') {
           Serial.println(linebuf);
-          
-          // you're starting a new line
-          for (int i=0; i<sizeof(linebuf); i++)
-          {
-            if (linebuf[i] == '=')
-            {
-              /*token = strtok(linebuf, ' ');
-              data.i = atoi(token);
-              Serial.println(data.i);
-
-              //token = strtok(NULL, delimiter);
-              data.c = token[0];
-              Serial.println(data.c);*/
-            }
+          currentLineIsBlank = true;
+          if (strstr(linebuf,"GET /?int=") > 0){
+            cad = &linebuf[10];
+            data.i = atoi(cad);            
           }
+          
+          else if (strstr(linebuf,"GET /?char=") > 0){
+            data.c = linebuf[11];            
+          }
+          
+          else if (strstr(linebuf,"GET /?bool=") > 0){
+            cad = &linebuf[11];
+            aux = atoi(cad);
+            if ( aux == 1)
+            {
+              data.b = true;
+            }
+            else
+            {
+              data.b = false;
+            }                     
+          }
+          
+          else if (strstr(linebuf,"GET /?double=") > 0){
+            cad = &linebuf[13];
+            data.d = atof(cad);            
+          }
+          
           // you're starting a new line
           currentLineIsBlank = true;
           memset(linebuf,0,sizeof(linebuf));
@@ -121,5 +137,15 @@ void loop(){
     // close the connection:
     client.stop();
     Serial.println("client disconnected");
+
+    Serial.println("DATA =>");
+    Serial.print("INT: ");
+    Serial.println(data.i);
+    Serial.print("CHAR: ");
+    Serial.println(data.c);
+    Serial.print("BOOL: ");
+    Serial.println(data.b);
+    Serial.print("DOUBLE: ");
+    Serial.println(data.d);
   }
 }
