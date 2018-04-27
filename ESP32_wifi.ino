@@ -8,6 +8,19 @@ WiFiServer server(80);
 // Client variables 
 char linebuf[80];
 int charcount=0;
+
+struct package
+{
+  int i=0;
+  char c;
+  boolean b;
+  double d;
+};
+
+typedef struct package Package;
+Package data;
+
+char *token;
  
 void setup()
 {
@@ -70,30 +83,27 @@ void loop(){
           client.println("<!DOCTYPE HTML><html><head>");
           client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>");
           client.println("<h1>ESP32 - Web Server</h1>");
-          client.println("<form>Enter data:<br><input type=\"text\" name=\"firstname\"><br><input type=\"submit\" value=\"Submit\"></form>");
+          client.println("<form>Enter data:<br><input type=\"text\" name=\"data\"><br><input type=\"submit\" value=\"Submit\"></form>");
           client.println("</html>");
           break;
         }
         
         if (c == '\n') {
           Serial.println(linebuf);
+          
           // you're starting a new line
-          currentLineIsBlank = true;
-          if (strstr(linebuf,"GET /on1") > 0){
-            Serial.println("LED 1 ON");
-            //digitalWrite(led1, HIGH);
-          }
-          else if (strstr(linebuf,"GET /off1") > 0){
-            Serial.println("LED 1 OFF");
-            //digitalWrite(led1, LOW);
-          }
-          else if (strstr(linebuf,"GET /on2") > 0){
-            Serial.println("LED 2 ON");
-            //digitalWrite(led2, HIGH);
-          }
-          else if (strstr(linebuf,"GET /off2") > 0){
-            Serial.println("LED 2 OFF");
-            //digitalWrite(led2, LOW);
+          for (int i=0; i<sizeof(linebuf); i++)
+          {
+            if (linebuf[i] == '=')
+            {
+              /*token = strtok(linebuf, ' ');
+              data.i = atoi(token);
+              Serial.println(data.i);
+
+              //token = strtok(NULL, delimiter);
+              data.c = token[0];
+              Serial.println(data.c);*/
+            }
           }
           // you're starting a new line
           currentLineIsBlank = true;
